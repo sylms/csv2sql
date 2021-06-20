@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:12.7-alpine
+    ports:
+      - 127.0.0.1:5432:5432
+    environment:
+      TZ: Asia/Tokyo
+      POSTGRES_DB: "${SYLMS_POSTGRES_DB}"
+      POSTGRES_USER: "${SYLMS_POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${SYLMS_POSTGRES_PASSWORD}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
