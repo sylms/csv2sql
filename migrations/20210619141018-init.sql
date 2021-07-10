@@ -29,7 +29,7 @@ create table if not exists syllabus (
 		csv_updated_at timestamp with time zone not null, -- csvに記載されている更新日時
     year int not null, -- 何年度にエクスポートした CSV であるか
 		created_at timestamp with time zone not null, -- 最初のデータ作成日時
-		updated_at timestamp with time zone not null, -- 実際の最終更新日時
+		updated_at timestamp with time zone not null, -- 最終更新日時
 		primary key (id)
 	);
 
