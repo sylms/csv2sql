@@ -143,10 +143,7 @@ func csvToSyllabusStruct(reader io.ReadCloser) ([]Syllabus, error) {
 			continue
 		}
 
-		term, err := termParser(row.Term)
-		if err != nil {
-			return nil, err
-		}
+		term := termParser(row.Term)
 
 		termInt, err := termStrToInt(term)
 		if err != nil {
@@ -233,11 +230,11 @@ func execMigrate() error {
 	return nil
 }
 
-func termParser(termString string) ([]string, error) {
+func termParser(termString string) []string {
 	res := []string{}
-	// if termString == "" {
-	// 	return nil, errors.New("invalid input:term input is empty")
-	// }
+	if termString == "" {
+		return []string{}
+	}
 	var re *regexp.Regexp
 	re = regexp.MustCompile(`(春A|春AA|春AA|春AB|春BA|春AC|春CA|春ABC)`)
 	if re.MatchString(termString) {
@@ -283,7 +280,7 @@ func termParser(termString string) ([]string, error) {
 	if re.MatchString(termString) {
 		res = append(res, "秋学期")
 	}
-	return res, nil
+	return res
 }
 
 // TODO: やる

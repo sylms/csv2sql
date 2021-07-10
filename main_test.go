@@ -12,10 +12,9 @@ func Test_termParser(t *testing.T) {
 		term_string string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    []string
-		wantErr bool
+		name string
+		args args
+		want []string
 	}{
 		{
 			name: "spring_A_B",
@@ -26,24 +25,18 @@ func Test_termParser(t *testing.T) {
 				"春A",
 				"春B",
 			},
-			wantErr: false,
 		},
 		{
-			name: "invalid_input",
+			name: "empty string -> empty []string",
 			args: args{
 				term_string: "",
 			},
-			want:    nil,
-			wantErr: true,
+			want: []string{},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := termParser(tt.args.term_string)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("termParser() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got := termParser(tt.args.term_string)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("termParser() = %v, want %v", got, tt.want)
 			}
@@ -221,6 +214,14 @@ func Test_termStrToInt(t *testing.T) {
 			want: []int{
 				1, 2,
 			},
+			wantErr: false,
+		},
+		{
+			name: "empty []string -> empty []int",
+			args: args{
+				term: []string{},
+			},
+			want:    []int{},
 			wantErr: false,
 		},
 		{
