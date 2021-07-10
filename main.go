@@ -299,17 +299,15 @@ func instructorParser(instructors string) ([]string, error) {
 }
 
 func creditedAuditorsParser(CreditedAuditors string) (int, error) {
-	var res int
 	if CreditedAuditors == "×" {
-		res = creditedAuditorsCross
+		return creditedAuditorsCross, nil
 	} else if CreditedAuditors == "△" {
-		res = creditedAuditorsTriangle
+		return creditedAuditorsTriangle, nil
 	} else if CreditedAuditors == "" {
-		res = creditedAuditorsEmpty
+		return creditedAuditorsEmpty, nil
 	} else {
 		return -1, errors.New("invalid input:CreditedAuditors input")
 	}
-	return res, nil
 }
 
 // KdB からエクスポートした CSV に含まれている更新日時カラムのものを time.Time に変換する
