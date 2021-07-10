@@ -30,6 +30,16 @@ var (
 	}
 )
 
+const (
+	// 科目履修生申請可否
+	// ×
+	creditedAuditorsCross = iota
+	// △
+	creditedAuditorsTriangle
+	// 空
+	creditedAuditorsEmpty
+)
+
 func main() {
 	var err error
 
@@ -291,11 +301,11 @@ func instructorParser(instructors string) ([]string, error) {
 func creditedAuditorsParser(CreditedAuditors string) (int, error) {
 	var res int
 	if CreditedAuditors == "×" {
-		res = 0
+		res = creditedAuditorsCross
 	} else if CreditedAuditors == "△" {
-		res = 1
+		res = creditedAuditorsTriangle
 	} else if CreditedAuditors == "" {
-		res = 2
+		res = creditedAuditorsEmpty
 	} else {
 		return -1, errors.New("invalid input:CreditedAuditors input")
 	}
