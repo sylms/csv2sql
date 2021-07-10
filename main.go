@@ -40,6 +40,22 @@ const (
 	creditedAuditorsEmpty
 )
 
+const (
+	// 開講時期
+	_               = iota
+	termSpringACode // 春A: 1
+	termSpringBCode
+	termSpringCCode
+	termFallACode
+	termFallBCode
+	termFallCCode
+	termSummerVacationCode
+	termSpringVacationCode
+	termAllCode
+	termSpringCode
+	termFallCode
+)
+
 func main() {
 	var err error
 
@@ -331,27 +347,27 @@ func termStrToInt(term []string) ([]int, error) {
 	for _, t := range term {
 		switch t {
 		case "春A":
-			res = append(res, 1)
+			res = append(res, termSpringACode)
 		case "春B":
-			res = append(res, 2)
+			res = append(res, termSpringBCode)
 		case "春C":
-			res = append(res, 3)
+			res = append(res, termSpringCCode)
 		case "秋A":
-			res = append(res, 4)
+			res = append(res, termFallACode)
 		case "秋B":
-			res = append(res, 5)
+			res = append(res, termFallBCode)
 		case "秋C":
-			res = append(res, 6)
+			res = append(res, termFallCCode)
 		case "夏季休業中":
-			res = append(res, 7)
+			res = append(res, termSummerVacationCode)
 		case "春季休業中":
-			res = append(res, 8)
+			res = append(res, termSpringVacationCode)
 		case "通年":
-			res = append(res, 9)
+			res = append(res, termAllCode)
 		case "春学期":
-			res = append(res, 10)
+			res = append(res, termSpringCode)
 		case "秋学期":
-			res = append(res, 11)
+			res = append(res, termFallCode)
 		default:
 			return nil, fmt.Errorf("invalid term string: %s", t)
 		}
