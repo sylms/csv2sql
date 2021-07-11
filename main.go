@@ -79,7 +79,7 @@ func main() {
 		log.Fatalf("%+v", err)
 	}
 
-	syllabus, err := csvToSyllabusStruct(kdbCSV)
+	courses, err := csvToCoursesStruct(kdbCSV)
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
@@ -89,8 +89,8 @@ func main() {
 		log.Fatalf("%+v", err)
 	}
 
-	for _, syl := range syllabus {
-		err = syl.insert(tx)
+	for _, c := range courses {
+		err = c.insert(tx)
 		if err != nil {
 			rollbackErr := tx.Rollback()
 			if rollbackErr != nil {
@@ -129,7 +129,7 @@ func readFromCSV() (io.ReadCloser, error) {
 	return f, nil
 }
 
-func csvToSyllabusStruct(reader io.ReadCloser) ([]Syllabus, error) {
+func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 	gocsv.SetCSVReader(func(in io.Reader) gocsv.CSVReader {
 		// KdB からダウンロードした CSV は ShiftJIS なため
 		r := csv.NewReader(transform.NewReader(in, japanese.ShiftJIS.NewDecoder()))
@@ -141,7 +141,7 @@ func csvToSyllabusStruct(reader io.ReadCloser) ([]Syllabus, error) {
 	kdbCsvRows := []*KdbExportCSV{}
 	err := gocsv.Unmarshal(reader, &kdbCsvRows)
 	if err != nil {
-		return []Syllabus{}, errors.WithStack(err)
+		return []Courses{}, errors.WithStack(err)
 	}
 	reader.Close()
 
@@ -151,8 +151,8 @@ func csvToSyllabusStruct(reader io.ReadCloser) ([]Syllabus, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	// CSV のもの（KdbExportCSV）から DB 向け（Syllabus）に構造体を組みなおす
-	syllabus := []Syllabus{}
+	// CSV のもの（KdbExportCSV）から DB 向け（Courses）に構造体を組みなおす
+	courses := []Courses{}
 	for _, row := range kdbCsvRows {
 		// 科目番号がないものは、それは科目ではないとみなしデータベースに投入しないようにする
 		if row.CourseNumber == "" {
@@ -191,7 +191,7 @@ func csvToSyllabusStruct(reader io.ReadCloser) ([]Syllabus, error) {
 			return nil, err
 		}
 
-		s := Syllabus{
+		s := Courses{
 			CourseNumber:             row.CourseNumber,
 			CourseName:               row.CourseName,
 			InstructionalType:        row.InstructionalType,
@@ -213,9 +213,9 @@ func csvToSyllabusStruct(reader io.ReadCloser) ([]Syllabus, error) {
 			CreatedAt:                getDateTimeNow(),
 			UpdatedAt:                getDateTimeNow(),
 		}
-		syllabus = append(syllabus, s)
+		courses = append(courses, s)
 	}
-	return syllabus, nil
+	return courses, nil
 }
 
 func getCredits(credits string) sql.NullFloat64 {
@@ -375,37 +375,37 @@ func termStrToInt(term []string) ([]int, error) {
 	return res, nil
 }
 
-func (syllabus Syllabus) insert(tx *sql.Tx) error {
+func (c *Courses) insert(tx *sql.Tx) error {
 	// TODO: レコードが重複して存在することが可能であるので、それを防ぐ
 	// insert しようとしているレコードが既にテーブルに存在しているかは確認する必要があるかもしれない
 	// UNIQUE 指定すれば、確認しなくてもよいらしい（？）
 
 	// NamedExec では Array の扱いがうまくいかなかったのでとりあえず Exec でやる
-	_, err := tx.Exec(`insert into syllabus (
+	_, err := tx.Exec(`insert into courses (
 		course_number, course_name, instructional_type, credits, standard_registration_year, term, period_, classroom, instructor, course_overview, remarks, credited_auditors, application_conditions, alt_course_name, course_code, course_code_name, csv_updated_at, year, created_at, updated_at
 		) values (
 		$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
 		)`,
-		syllabus.CourseNumber,
-		syllabus.CourseName,
-		syllabus.InstructionalType,
-		syllabus.Credits,
-		pq.Array(syllabus.StandardRegistrationYear),
-		pq.Array(syllabus.Term),
-		pq.Array(syllabus.Period),
-		syllabus.Classroom,
-		pq.Array(syllabus.Instructor),
-		syllabus.CourseOverview,
-		syllabus.Remarks,
-		syllabus.CreditedAuditors,
-		syllabus.ApplicationConditions,
-		syllabus.AltCourseName,
-		syllabus.CourseCode,
-		syllabus.CourseCodeName,
-		syllabus.CSVUpdatedAt,
-		syllabus.Year,
-		syllabus.CreatedAt,
-		syllabus.UpdatedAt,
+		c.CourseNumber,
+		c.CourseName,
+		c.InstructionalType,
+		c.Credits,
+		pq.Array(c.StandardRegistrationYear),
+		pq.Array(c.Term),
+		pq.Array(c.Period),
+		c.Classroom,
+		pq.Array(c.Instructor),
+		c.CourseOverview,
+		c.Remarks,
+		c.CreditedAuditors,
+		c.ApplicationConditions,
+		c.AltCourseName,
+		c.CourseCode,
+		c.CourseCodeName,
+		c.CSVUpdatedAt,
+		c.Year,
+		c.CreatedAt,
+		c.UpdatedAt,
 	)
 	if err != nil {
 		return errors.WithStack(err)

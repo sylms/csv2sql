@@ -30,7 +30,7 @@ type KdbExportCSV struct {
 	UpdatedAt string `csv:"データ更新日"`
 }
 
-type Syllabus struct {
+type Courses struct {
 	ID           int    `db:"id"`
 	CourseNumber string `db:"course_number"`
 	CourseName   string `db:"course_name"`
