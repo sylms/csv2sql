@@ -56,14 +56,31 @@ const (
 	termFallCode
 )
 
+const (
+	envSylmsPostgresDBKey       = "SYLMS_POSTGRES_DB"
+	envSylmsPostgresUserKey     = "SYLMS_POSTGRES_USER"
+	envSylmsPostgresPasswordKey = "SYLMS_POSTGRES_PASSWORD"
+	envSylmsPostgresHostKey     = "SYLMS_POSTGRES_HOST"
+	envSylmsPostgresPortKey     = "SYLMS_POSTGRES_PORT"
+	envSylmsCsvYear             = "SYLMS_CSV_YEAR"
+)
+
 func main() {
 	var err error
 
-	postgresDb := os.Getenv("SYLMS_POSTGRES_DB")
-	postgresUser := os.Getenv("SYLMS_POSTGRES_USER")
-	postgresPassword := os.Getenv("SYLMS_POSTGRES_PASSWORD")
-	postgresHost := os.Getenv("SYLMS_POSTGRES_HOST")
-	postgresPort := os.Getenv("SYLMS_POSTGRES_PORT")
+	envKeys := []string{envSylmsPostgresDBKey, envSylmsPostgresUserKey, envSylmsPostgresPasswordKey, envSylmsPostgresHostKey, envSylmsPostgresPortKey, envSylmsCsvYear}
+	for _, key := range envKeys {
+		val, ok := os.LookupEnv(key)
+		if !ok || val == "" {
+			log.Fatalf("%s is not set or empty\n", key)
+		}
+	}
+
+	postgresDb := os.Getenv(envSylmsPostgresDBKey)
+	postgresUser := os.Getenv(envSylmsPostgresUserKey)
+	postgresPassword := os.Getenv(envSylmsPostgresPasswordKey)
+	postgresHost := os.Getenv(envSylmsPostgresHostKey)
+	postgresPort := os.Getenv(envSylmsPostgresPortKey)
 	db, err = sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", postgresHost, postgresPort, postgresUser, postgresPassword, postgresDb))
 	if err != nil {
 		log.Fatalf("%+v", err)
@@ -145,7 +162,7 @@ func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 	}
 	reader.Close()
 
-	yearStr := os.Getenv("SYLMS_CSV_YEAR")
+	yearStr := os.Getenv(envSylmsCsvYear)
 	year, err := strconv.Atoi(yearStr)
 	if err != nil {
 		return nil, errors.WithStack(err)
