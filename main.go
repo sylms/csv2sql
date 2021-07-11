@@ -425,8 +425,8 @@ func (c *Courses) insert(tx *sql.Tx) error {
 }
 
 // TODO: やる
-func standardRegistrationYearParser(yearString string) ([]int, error) {
-	year := []int{}
+func standardRegistrationYearParser(yearString string) ([]string, error) {
+	year := []string{}
 	/*
 		yearString = strings.Replace(yearString, "ー", "-", -1)
 		yearString = strings.Replace(yearString, "・", "-", -1)
@@ -442,8 +442,8 @@ func standardRegistrationYearParser(yearString string) ([]int, error) {
 		}
 	*/
 
-	// とりあえずで、すべて 1 というデータを投入する
-	year = append(year, 1)
+	// とりあえずで、"1" を投入する
+	year = append(year, "1")
 	return year, nil
 }
 

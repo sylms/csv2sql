@@ -8,13 +8,16 @@ create type instructional_type as enum ('0', '1', '2', '3', '4', '5', '6', '7', 
 -- 科目等履修生は、マル・バツ・空文字列の3択であるため
 create type credited_auditors as enum ('0', '1', '2');
 
+-- `?` をそのまま維持するため
+create type standard_registration_year as enum ('?', '1', '2', '3', '4', '5', '6');
+
 create table if not exists courses (
 		id serial not null,
 		course_number varchar(16) not null, -- 科目番号
 		course_name varchar(256) not null, -- 科目名
 		instructional_type instructional_type not null, -- 授業方法
 		credits varchar(8) not null, -- 単位数
-		standard_registration_year int[] not null, -- 標準履修年次
+		standard_registration_year standard_registration_year[] not null, -- 標準履修年次
 		term int[], -- 開講時期
 		period_ varchar(16)[] not null, -- 曜時限
 		classroom varchar(256), -- 教室
