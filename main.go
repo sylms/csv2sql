@@ -28,6 +28,7 @@ var (
 	migrations = &migrate.FileMigrationSource{
 		Dir: "migrations",
 	}
+	now time.Time
 )
 
 const (
@@ -75,6 +76,8 @@ func main() {
 			log.Fatalf("%s is not set or empty\n", key)
 		}
 	}
+
+	now = getDateTimeNow()
 
 	postgresDb := os.Getenv(envSylmsPostgresDBKey)
 	postgresUser := os.Getenv(envSylmsPostgresUserKey)
@@ -227,8 +230,8 @@ func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 			CourseCodeName:           newSQLNullString(row.CourseCodeName),
 			CSVUpdatedAt:             csvUpdatedAt,
 			Year:                     year,
-			CreatedAt:                getDateTimeNow(),
-			UpdatedAt:                getDateTimeNow(),
+			CreatedAt:                now,
+			UpdatedAt:                now,
 		}
 		courses = append(courses, s)
 	}
