@@ -195,7 +195,7 @@ func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 			CourseNumber:             row.CourseNumber,
 			CourseName:               row.CourseName,
 			InstructionalType:        row.InstructionalType,
-			Credits:                  getCredits(row.Credits),
+			Credits:                  row.Credits,
 			StandardRegistrationYear: standardRegistrationYearParser,
 			Term:                     termInt,
 			Period:                   period,
@@ -216,15 +216,6 @@ func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 		courses = append(courses, s)
 	}
 	return courses, nil
-}
-
-func getCredits(credits string) sql.NullFloat64 {
-	f, err := strconv.ParseFloat(credits, 64)
-	if err != nil {
-		// 単位数が '-' や空文字列である場合は null とするため
-		return sql.NullFloat64{Valid: false}
-	}
-	return sql.NullFloat64{Float64: f, Valid: true}
 }
 
 func newSQLNullString(s string) sql.NullString {

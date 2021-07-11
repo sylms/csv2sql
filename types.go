@@ -35,9 +35,9 @@ type Courses struct {
 	CourseNumber string `db:"course_number"`
 	CourseName   string `db:"course_name"`
 	// 対応付けを別に持つ
-	InstructionalType        int             `db:"instructional_type"`
-	Credits                  sql.NullFloat64 `db:"credits"`
-	StandardRegistrationYear []int           `db:"standard_registration_year"`
+	InstructionalType        int    `db:"instructional_type"`
+	Credits                  string `db:"credits"`
+	StandardRegistrationYear []int  `db:"standard_registration_year"`
 	// 対応付けを別に持つ
 	Term []int `db:"term"`
 	// 例：月1, 月2

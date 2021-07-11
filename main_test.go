@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"reflect"
 	"testing"
 	"time"
@@ -96,53 +95,6 @@ func Test_creditedAuditorsParser(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("creditedAuditorsParser() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_getCredits(t *testing.T) {
-	type args struct {
-		credits string
-	}
-	tests := []struct {
-		name string
-		args args
-		want sql.NullFloat64
-	}{
-		{
-			name: "normal int",
-			args: args{
-				credits: "3.0",
-			},
-			want: sql.NullFloat64{Float64: 3.0, Valid: true},
-		},
-		{
-			name: "normal float",
-			args: args{
-				credits: "3.5",
-			},
-			want: sql.NullFloat64{Float64: 3.5, Valid: true},
-		},
-		{
-			name: "invalid input: '-'",
-			args: args{
-				credits: "-",
-			},
-			want: sql.NullFloat64{Valid: false},
-		},
-		{
-			name: "invalid input: empty",
-			args: args{
-				credits: "",
-			},
-			want: sql.NullFloat64{Valid: false},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getCredits(tt.args.credits); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getCredits() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -13,7 +13,7 @@ create table if not exists courses (
 		course_number varchar(16) not null, -- 科目番号
 		course_name varchar(256) not null, -- 科目名
 		instructional_type instructional_type not null, -- 授業方法
-		credits numeric, -- 単位数
+		credits varchar(8) not null, -- 単位数
 		standard_registration_year int[] not null, -- 標準履修年次
 		term int[], -- 開講時期
 		period_ varchar(16)[] not null, -- 曜時限
