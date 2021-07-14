@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 	"unicode/utf8"
 
@@ -215,7 +216,7 @@ func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 			CourseNumber:             row.CourseNumber,
 			CourseName:               row.CourseName,
 			InstructionalType:        row.InstructionalType,
-			Credits:                  row.Credits,
+			Credits:                  strings.TrimSpace(row.Credits),
 			StandardRegistrationYear: standardRegistrationYearParser,
 			Term:                     termInt,
 			Period:                   period,
