@@ -14,6 +14,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"bytes"
 	"github.com/gocarina/gocsv"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -100,7 +101,25 @@ func main() {
 		log.Fatalf("%+v", err)
 	}
 
-	courses, err := csvToCoursesStruct(kdbCSV)
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(kdbCSV)
+	csvStr := buf.String()
+
+	// replace
+	re0 := regexp.MustCompile("\"\\s*\r\n\\s*\"")
+	re1 := regexp.MustCompile("^\\s*\"\"")
+	re2 := regexp.MustCompile("\"\"\\s*$")
+	escapedDoubleQuotationStr := strings.Replace(csvStr, `"`, `""`, -1)
+	unEscapedDCAroundCommaStr := strings.Replace(escapedDoubleQuotationStr, `","`, `,`, -1)
+	unEscapedDCAroundNLStr := re0.ReplaceAllString(unEscapedDCAroundCommaStr, "\r\n")
+	unEscapedDCBeginOfLineStr := re1.ReplaceAllString(unEscapedDCAroundNLStr, `"`)
+	unEscapedDCEndOfLineStr := re2.ReplaceAllString(unEscapedDCBeginOfLineStr, `"`)
+	replacedCSVStr := unEscapedDCEndOfLineStr
+
+	readerReplacedCSV := strings.NewReader(replacedCSVStr)
+	readerReplacedCSVCloser := io.NopCloser(readerReplacedCSV)
+
+	courses, err := csvToCoursesStruct(readerReplacedCSVCloser)
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
@@ -160,6 +179,7 @@ func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 	})
 
 	kdbCsvRows := []*KdbExportCSV{}
+	// Unmarchal は CSV の生から定義した構造体に落とし込んでくれている．
 	err := gocsv.Unmarshal(reader, &kdbCsvRows)
 	if err != nil {
 		return []Courses{}, errors.WithStack(err)
