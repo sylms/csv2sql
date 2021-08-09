@@ -105,17 +105,32 @@ func main() {
 	buf.ReadFrom(kdbCSV)
 	csvStr := buf.String()
 
-	// replace
-	re0 := regexp.MustCompile("\"\\s*\r\n\\s*\"")
-	re1 := regexp.MustCompile("^\\s*\"\"")
-	re2 := regexp.MustCompile("\"\"\\s*$")
+	// double quotation escape and separate comma enable
+	// ダブルクォーテーションをエスケープする
+	// ダブルクォーテーションはエスケープされていないのでまず全て2倍にする
+	// その後に区切り文字のカンマまわりのダブルクォーテーションが2重になっていることを解消する
+	// また，各行の最初と最後のダブルクォーテーションが2重になっていることも解消する
 	escapedDoubleQuotationStr := strings.Replace(csvStr, `"`, `""`, -1)
 	unEscapedDCAroundCommaStr := strings.Replace(escapedDoubleQuotationStr, `","`, `,`, -1)
+
+	// 各行の最後と次行の最初のダブルクォーテーションが2重になっているため解消する
+	// また，行の最初と最後に空白文字が入っている場合があるため，それへの対策を講じている
+	re0 := regexp.MustCompile("\"\\s*\r\n\\s*\"")
 	unEscapedDCAroundNLStr := re0.ReplaceAllString(unEscapedDCAroundCommaStr, "\r\n")
+
+	// ファイルの先頭のダブルクォーテーションが2重になっているため解消する
+	// 行の最初と最後に空白文字が入っている場合があるため，それへの対策を講じている
+	re1 := regexp.MustCompile("^\\s*\"\"")
 	unEscapedDCBeginOfLineStr := re1.ReplaceAllString(unEscapedDCAroundNLStr, `"`)
+
+	// ファイルの末尾のダブルクォーテーションが2重になっているため解消する
+	// 行の最初と最後に空白文字が入っている場合があるため，それへの対策を講じている
+	re2 := regexp.MustCompile("\"\"\\s*$")
 	unEscapedDCEndOfLineStr := re2.ReplaceAllString(unEscapedDCBeginOfLineStr, `"`)
+
 	replacedCSVStr := unEscapedDCEndOfLineStr
 
+	// string to io.Reader
 	readerReplacedCSV := strings.NewReader(replacedCSVStr)
 	readerReplacedCSVCloser := io.NopCloser(readerReplacedCSV)
 
