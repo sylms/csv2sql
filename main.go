@@ -15,6 +15,7 @@ import (
 	"unicode/utf8"
 
 	"bytes"
+
 	"github.com/gocarina/gocsv"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
