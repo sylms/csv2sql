@@ -200,3 +200,85 @@ func Test_termStrToInt(t *testing.T) {
 		})
 	}
 }
+
+func Test_standardRegistrationYearParser(t *testing.T) {
+	type args struct {
+		yearString string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []string
+		wantErr bool
+	}{
+		{
+			name: "nakaguro",
+			args: args{
+				yearString: "1・3",
+			},
+			want:    []string{"1", "2", "3"},
+			wantErr: false,
+		},
+		{
+			name: "haihun",
+			args: args{
+				yearString: "1-3",
+			},
+			want:    []string{"1", "2", "3"},
+			wantErr: false,
+		},
+		{
+			name: "haihun space",
+			args: args{
+				yearString: "1 - 3",
+			},
+			want:    []string{"1", "2", "3"},
+			wantErr: false,
+		},
+		{
+			name: "1・2",
+			args: args{
+				yearString: "1・2",
+			},
+			want:    []string{"1", "2"},
+			wantErr: false,
+		},
+		{
+			name: "simgle",
+			args: args{
+				yearString: "1",
+			},
+			want:    []string{"1"},
+			wantErr: false,
+		},
+		{
+			name: "question",
+			args: args{
+				yearString: "?",
+			},
+			// ? はそのまま保持する方針
+			want:    []string{"?"},
+			wantErr: false,
+		},
+		{
+			name: "not int",
+			args: args{
+				yearString: "invalid",
+			},
+			want:    []string{},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := standardRegistrationYearParser(tt.args.yearString)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("standardRegistrationYearParser() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("standardRegistrationYearParser() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
