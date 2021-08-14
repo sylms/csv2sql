@@ -492,14 +492,79 @@ func standardRegistrationYearParser(yearString string) ([]string, error) {
 	return year, nil
 }
 
-// TODO: やる
+// 時間割をいい感じにして配列で
 func periodParser(periodString string) ([]string, error) {
-	// 一時的に配列の要素1つにそのままデータをいれるようにする（分割しない）
 	period := []string{}
-	if utf8.RuneCountInString(periodString) > 10 {
-		period = append(period, string([]rune(periodString[:10])))
-	} else {
-		period = append(period, periodString)
+	periodString = strings.Replace(periodString, " ", "", -1)
+	periodString = strings.Replace(periodString, "　", "", -1)
+	periodString = strings.Replace(periodString, "ー", "-", -1)
+	periodString = strings.Replace(periodString, "・", "", -1)
+	periodString = strings.Replace(periodString, ",", "", -1)
+	periodString = strings.Replace(periodString, "集中", "集0", -1)
+	periodString = strings.Replace(periodString, "応談", "応0", -1)
+	periodString = strings.Replace(periodString, "随時", "随0", -1)
+
+	/*
+		if strings.Contains(periodString, "集中") {
+			period = append(period, "集中")
+			periodString = strings.Replace(periodString, "集中", "", -1)
+		}
+		if strings.Contains(periodString, "応談") {
+			period = append(period, "応談")
+			periodString = strings.Replace(periodString, "応談", "", -1)
+		}
+		if strings.Contains(periodString, "随時") {
+			period = append(period, "随時")
+			periodString = strings.Replace(periodString, "随時", "", -1)
+		}
+	*/
+
+	for i := 1; i <= 8; i++ {
+		listPeriod := strconv.Itoa(i)
+		for j := i + 1; j <= 8; j++ {
+			listPeriod = listPeriod + strconv.Itoa(j)
+			spanPeriod := strconv.Itoa(i) + "-" + strconv.Itoa(j)
+			periodString = strings.Replace(periodString, spanPeriod, listPeriod, -1)
+		}
 	}
+
+	for i := 0; i <= 8; i++ {
+		for _, dayOfWeek := range []string{"月", "火", "水", "木", "金", "土", "日", "応", "随", "集"} {
+			beforeStr1 := strconv.Itoa(i) + dayOfWeek
+			beforeStr2 := dayOfWeek + strconv.Itoa(i)
+			afterStr1 := strconv.Itoa(i) + "," + dayOfWeek
+			afterStr2 := dayOfWeek + ":" + strconv.Itoa(i)
+			periodString = strings.Replace(periodString, beforeStr1, afterStr1, -1)
+			periodString = strings.Replace(periodString, beforeStr2, afterStr2, -1)
+		}
+	}
+	if len(periodString) == 0 {
+		return period, nil
+	}
+	strList := strings.Split(periodString, ",")
+
+	for _, str := range strList {
+		strList2 := strings.Split(str, ":")
+		if len(strList2) != 2 {
+			fmt.Println("-" + periodString + "-")
+			return nil, errors.New("unexpected period input : " + str)
+		} else {
+			dayOfWeek := strList2[0]
+			timeTimetable := strList2[1]
+			for i := 0; i < len([]rune(dayOfWeek)); i++ {
+				for j := 0; j < len([]rune(timeTimetable)); j++ {
+					inputStr := string([]rune(dayOfWeek)[i]) + string([]rune(timeTimetable)[j])
+					inputStr = strings.Replace(inputStr, "集0", "集", -1)
+					inputStr = strings.Replace(inputStr, "集", "集中", -1)
+					inputStr = strings.Replace(inputStr, "随0", "随", -1)
+					inputStr = strings.Replace(inputStr, "随", "随時", -1)
+					inputStr = strings.Replace(inputStr, "応0", "応", -1)
+					inputStr = strings.Replace(inputStr, "応", "応用", -1)
+					period = append(period, inputStr)
+				}
+			}
+		}
+	}
+
 	return period, nil
 }
