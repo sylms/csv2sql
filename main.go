@@ -460,26 +460,28 @@ func (c *Courses) insert(tx *sql.Tx) error {
 	return nil
 }
 
-// TODO: やる
+// 標準履修年次を配列として返す
+// 中黒をハイフンとして解釈すると"?" or "int" or "int-int" になるので，"?", "int" はそのまま
+// それ以外は間全てをいれる
 func standardRegistrationYearParser(yearString string) ([]string, error) {
 	year := []string{}
-	/*
-		yearString = strings.Replace(yearString, "ー", "-", -1)
-		yearString = strings.Replace(yearString, "・", "-", -1)
-		yearString = strings.Replace(yearString, "～", "-", -1)
-		yearString = strings.Replace(yearString, "~", "-", -1)
-		yearString = strings.Replace(yearString, "、", ",", -1)
-		yearString = strings.Replace(yearString, " ", "", -1)
-		moji.Convert(yearString, moji.ZE, moji.HE)
-		moji.Convert(yearString, moji.ZS, moji.HS)
-		slice := strings.Split(yearString, ",")
-		for _, str := range slice {
-			if isInt
-		}
-	*/
+	yearString = strings.Replace(yearString, "ー", "-", -1)
+	yearString = strings.Replace(yearString, "・", "-", -1)
+	yearString = strings.Replace(yearString, "～", "-", -1)
+	yearString = strings.Replace(yearString, "~", "-", -1)
+	yearString = strings.Replace(yearString, "、", ",", -1)
+	yearString = strings.Replace(yearString, " ", "", -1)
 
-	// とりあえずで、"1" を投入する
-	year = append(year, "1")
+	if len(yearString) == 1 {
+		year = append(year, yearString)
+	} else {
+		minYear, _ := strconv.Atoi(string(yearString[0]))
+		maxYear, _ := strconv.Atoi(string(yearString[2]))
+		for i := minYear; i <= maxYear; i++ {
+			year = append(year, strconv.Itoa(i))
+		}
+	}
+
 	return year, nil
 }
 
