@@ -475,8 +475,14 @@ func standardRegistrationYearParser(yearString string) ([]string, error) {
 	if len(yearString) == 1 {
 		year = append(year, yearString)
 	} else {
-		minYear, _ := strconv.Atoi(string(yearString[0]))
+		minYear, err := strconv.Atoi(string(yearString[0]))
+		if err != nil {
+			return []string{}, err
+		}
 		maxYear, _ := strconv.Atoi(string(yearString[2]))
+		if err != nil {
+			return []string{}, err
+		}
 		for i := minYear; i <= maxYear; i++ {
 			year = append(year, strconv.Itoa(i))
 		}
