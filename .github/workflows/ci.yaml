@@ -1,0 +1,35 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+
+jobs:
+  golangci-lint:
+    name: lint
+    strategy:
+      matrix:
+        # go-version: [1.16.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: reviewdog/action-golangci-lint@v2
+
+  test:
+    name: test
+    strategy:
+      matrix:
+        go-version: ['1.16']
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: test
+      run: go test ./...
