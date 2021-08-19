@@ -559,7 +559,7 @@ func periodParser(periodString string) ([]string, error) {
 					inputStr = strings.Replace(inputStr, "随0", "随", -1)
 					inputStr = strings.Replace(inputStr, "随", "随時", -1)
 					inputStr = strings.Replace(inputStr, "応0", "応", -1)
-					inputStr = strings.Replace(inputStr, "応", "応用", -1)
+					inputStr = strings.Replace(inputStr, "応", "応談", -1)
 					period = append(period, inputStr)
 				}
 			}
