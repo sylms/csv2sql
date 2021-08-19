@@ -21,7 +21,7 @@ create table if not exists courses (
 		term int[], -- 開講時期
 		period_ varchar(16)[] not null, -- 曜時限
 		classroom varchar(256), -- 教室
-		instructor varchar(32)[] not null, -- 担当教員
+		instructor varchar(256)[] not null, -- 担当教員
 		course_overview text, -- 授業概要
 		remarks text, -- 備考
 		credited_auditors credited_auditors not null, -- 科目履修生申請可否

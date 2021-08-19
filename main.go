@@ -347,15 +347,9 @@ func termParser(termString string) []string {
 	return res
 }
 
-// TODO: やる
+// カンマ区切りで担当教員を配列で返す
 func instructorParser(instructors string) ([]string, error) {
-	res := []string{}
-	// 一時的に配列の要素1つにそのままデータをいれるようにする（分割しない）
-	if utf8.RuneCountInString(instructors) > 10 {
-		res = append(res, string([]rune(instructors[:10])))
-	} else {
-		res = append(res, instructors)
-	}
+	res := strings.Split(instructors, ",")
 	return res, nil
 }
 
