@@ -504,21 +504,6 @@ func periodParser(periodString string) ([]string, error) {
 	periodString = strings.Replace(periodString, "応談", "応0", -1)
 	periodString = strings.Replace(periodString, "随時", "随0", -1)
 
-	/*
-		if strings.Contains(periodString, "集中") {
-			period = append(period, "集中")
-			periodString = strings.Replace(periodString, "集中", "", -1)
-		}
-		if strings.Contains(periodString, "応談") {
-			period = append(period, "応談")
-			periodString = strings.Replace(periodString, "応談", "", -1)
-		}
-		if strings.Contains(periodString, "随時") {
-			period = append(period, "随時")
-			periodString = strings.Replace(periodString, "随時", "", -1)
-		}
-	*/
-
 	for i := 1; i <= 8; i++ {
 		listPeriod := strconv.Itoa(i)
 		for j := i + 1; j <= 8; j++ {
