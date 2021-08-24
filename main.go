@@ -139,20 +139,18 @@ func main() {
 		log.Fatalf("%+v", err)
 	}
 
-	tx, err := db.Begin()
+	tx, err := db.Beginx()
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
 
-	for _, c := range courses {
-		err = c.insert(tx)
-		if err != nil {
-			rollbackErr := tx.Rollback()
-			if rollbackErr != nil {
-				log.Fatalf("rollback error: %+v", err)
-			}
-			log.Fatalf("%+v", err)
+	err = insert(tx, courses)
+	if err != nil {
+		rollbackErr := tx.Rollback()
+		if rollbackErr != nil {
+			log.Fatalf("rollback error: %+v", err)
 		}
+		log.Fatalf("%+v", err)
 	}
 
 	err = tx.Commit()
@@ -416,41 +414,85 @@ func termStrToInt(term []string) ([]int, error) {
 	return res, nil
 }
 
-func (c *Courses) insert(tx *sql.Tx) error {
+func insert(tx *sqlx.Tx, courses []Courses) error {
 	// TODO: レコードが重複して存在することが可能であるので、それを防ぐ
 	// insert しようとしているレコードが既にテーブルに存在しているかは確認する必要があるかもしれない
 	// UNIQUE 指定すれば、確認しなくてもよいらしい（？）
 
-	// NamedExec では Array の扱いがうまくいかなかったのでとりあえず Exec でやる
-	_, err := tx.Exec(`insert into courses (
-		course_number, course_name, instructional_type, credits, standard_registration_year, term, period_, classroom, instructor, course_overview, remarks, credited_auditors, application_conditions, alt_course_name, course_code, course_code_name, csv_updated_at, year, created_at, updated_at
-		) values (
-		$1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
-		)`,
-		c.CourseNumber,
-		c.CourseName,
-		c.InstructionalType,
-		c.Credits,
-		pq.Array(c.StandardRegistrationYear),
-		pq.Array(c.Term),
-		pq.Array(c.Period),
-		c.Classroom,
-		pq.Array(c.Instructor),
-		c.CourseOverview,
-		c.Remarks,
-		c.CreditedAuditors,
-		c.ApplicationConditions,
-		c.AltCourseName,
-		c.CourseCode,
-		c.CourseCodeName,
-		c.CSVUpdatedAt,
-		c.Year,
-		c.CreatedAt,
-		c.UpdatedAt,
-	)
-	if err != nil {
-		return errors.WithStack(err)
+	type insertPrepare struct {
+		CourseNumber             string         `db:"course_number"`
+		CourseName               string         `db:"course_name"`
+		InstructionalType        int            `db:"instructional_type"`
+		Credits                  string         `db:"credits"`
+		StandardRegistrationYear interface{}    `db:"standard_registration_year"`
+		Term                     interface{}    `db:"term"`
+		Period                   interface{}    `db:"period_"`
+		Classroom                sql.NullString `db:"classroom"`
+		Instructor               interface{}    `db:"instructor"`
+		CourseOverview           sql.NullString `db:"course_overview"`
+		Remarks                  sql.NullString `db:"remarks"`
+		CreditedAuditors         int            `db:"credited_auditors"`
+		ApplicationConditions    sql.NullString `db:"application_conditions"`
+		AltCourseName            sql.NullString `db:"alt_course_name"`
+		CourseCode               sql.NullString `db:"course_code"`
+		CourseCodeName           sql.NullString `db:"course_code_name"`
+		CSVUpdatedAt             time.Time      `db:"csv_updated_at"`
+		Year                     int            `db:"year"`
+		CreatedAt                time.Time      `db:"created_at"`
+		UpdatedAt                time.Time      `db:"updated_at"`
 	}
+
+	// 全て（約 19,000 件）を一気に insert しようとしたら制限に引っかかった
+	// pq: got 395920 parameters but PostgreSQL only supports 65535 parameters
+	// およそ 20 カラムあるので、20 * 3000 = 60000 より 3000 レコード区切りで insert していく
+	const bulkInsertLimit = 3000
+	// 3000 レコードごとに分割したときの個数（make で確保するときのために +1）
+	bulkInsertCount := (len(courses) / bulkInsertLimit) + 1
+	pre := make([][]insertPrepare, bulkInsertCount)
+
+	bulkInsertCountNow := -1
+
+	for count, c := range courses {
+		if count%bulkInsertLimit == 0 {
+			bulkInsertCountNow++
+		}
+		temp := insertPrepare{
+			CourseNumber:             c.CourseNumber,
+			CourseName:               c.CourseName,
+			InstructionalType:        c.InstructionalType,
+			Credits:                  c.Credits,
+			StandardRegistrationYear: pq.Array(c.StandardRegistrationYear),
+			Term:                     pq.Array(c.Term),
+			Period:                   pq.Array(c.Period),
+			Classroom:                c.Classroom,
+			Instructor:               pq.Array(c.Instructor),
+			CourseOverview:           c.CourseOverview,
+			Remarks:                  c.Remarks,
+			CreditedAuditors:         c.CreditedAuditors,
+			ApplicationConditions:    c.ApplicationConditions,
+			AltCourseName:            c.AltCourseName,
+			CourseCode:               c.CourseCode,
+			CourseCodeName:           c.CourseCodeName,
+			CSVUpdatedAt:             c.CSVUpdatedAt,
+			Year:                     c.Year,
+			CreatedAt:                c.CreatedAt,
+			UpdatedAt:                c.UpdatedAt,
+		}
+		pre[bulkInsertCountNow] = append(pre[bulkInsertCountNow], temp)
+	}
+
+	for _, p := range pre {
+		_, err := tx.NamedExec(`insert into courses (
+			course_number, course_name, instructional_type, credits, standard_registration_year, term, period_, classroom, instructor, course_overview, remarks, credited_auditors, application_conditions, alt_course_name, course_code, course_code_name, csv_updated_at, year, created_at, updated_at
+		) values (
+			:course_number, :course_name, :instructional_type, :credits, :standard_registration_year, :term, :period_, :classroom, :instructor, :course_overview, :remarks, :credited_auditors, :application_conditions, :alt_course_name, :course_code, :course_code_name, :csv_updated_at, :year, :created_at, :updated_at
+		)`, p)
+
+		if err != nil {
+			return errors.WithStack(err)
+		}
+	}
+
 	return nil
 }
 
