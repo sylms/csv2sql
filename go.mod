@@ -3,6 +3,7 @@ module github.com/sylms/csv2sql
 go 1.16
 
 require (
+	github.com/gobuffalo/packr/v2 v2.8.1 // indirect
 	github.com/gocarina/gocsv v0.0.0-20210516172204-ca9e8a8ddea8 // indirect
 	github.com/jmoiron/sqlx v1.3.4 // indirect
 	github.com/ktnyt/go-moji v1.0.0 // indirect
