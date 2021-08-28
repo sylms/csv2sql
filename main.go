@@ -160,6 +160,7 @@ func main() {
 	}
 
 	log.Println("done")
+	os.Exit(0)
 }
 
 // 実行ファイルのカレントからみて ${csvDirName}/${csvFilename} の CSV ファイルを読み込む
