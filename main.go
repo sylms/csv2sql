@@ -15,6 +15,7 @@ import (
 
 	"bytes"
 
+	"github.com/gobuffalo/packr/v2"
 	"github.com/gocarina/gocsv"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -27,8 +28,8 @@ import (
 
 var (
 	db         *sqlx.DB
-	migrations = &migrate.FileMigrationSource{
-		Dir: "migrations",
+	migrations = &migrate.PackrMigrationSource{
+		Box: packr.New("migrations", "./migrations"),
 	}
 	now time.Time
 )
@@ -159,6 +160,7 @@ func main() {
 	}
 
 	log.Println("done")
+	os.Exit(0)
 }
 
 // 実行ファイルのカレントからみて ${csvDirName}/${csvFilename} の CSV ファイルを読み込む
