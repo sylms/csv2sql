@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+  csv2sql:
+    image: csv2sql
+    build:
+      context: .
+    volumes:
+      - "./csv/kdb.csv:/app/csv/kdb.csv:ro"
+    environment:
+      - SYLMS_POSTGRES_DB=sylms
+      - SYLMS_POSTGRES_USER=sylms
+      - SYLMS_POSTGRES_PASSWORD=sylms
+      - SYLMS_POSTGRES_HOST=db
+      - SYLMS_POSTGRES_PORT=5432
+      - SYLMS_CSV_YEAR=2021
+    entrypoint: dockerize --wait tcp://db:5432
+    command: /app/csv2sql
+    depends_on:
+      - db
+
+  db:
+    image: postgres:12.7-alpine
+    ports:
+      - 127.0.0.1:5432:5432
+    environment:
+      TZ: Asia/Tokyo
+      POSTGRES_DB: sylms
+      POSTGRES_USER: sylms
+      POSTGRES_PASSWORD: sylms
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
