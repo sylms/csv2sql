@@ -348,8 +348,18 @@ func termParser(termString string) []string {
 
 // カンマ区切りで担当教員を配列で返す
 func instructorParser(instructors string) ([]string, error) {
-	res := strings.Split(instructors, ",")
-	return res, nil
+	if instructors == "" {
+		return []string{}, nil
+	} else {
+		var res []string
+		slicedInstructors := strings.Split(instructors, ",")
+		for _, v := range slicedInstructors {
+			if "" != strings.Replace(v, " ", "", -1) {
+				res = append(res, v)
+			}
+		}
+		return res, nil
+	}
 }
 
 func creditedAuditorsParser(CreditedAuditors string) (int, error) {
