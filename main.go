@@ -346,7 +346,10 @@ func termParser(termString string) []string {
 
 // カンマ区切りで担当教員を配列で返す
 func instructorParser(instructors string) ([]string, error) {
-	res := strings.Split(instructors, ",")
+	// A, B, C 他 のような入力の際に [ A, B, C, 他] と返すように
+	re0 := regexp.MustCompile("他")
+	processedInstructors := re0.ReplaceAllString(instructors, `,他`)
+	res := strings.Split(processedInstructors, ",")
 	return res, nil
 }
 
