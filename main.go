@@ -346,8 +346,12 @@ func termParser(termString string) []string {
 
 // カンマ区切りで担当教員を配列で返す
 func instructorParser(instructors string) ([]string, error) {
-	res := strings.Split(instructors, ",")
-	return res, nil
+	if instructors == "" {
+		return []string{}, nil
+	} else {
+		res := strings.Split(instructors, ",")
+		return res, nil
+	}
 }
 
 func creditedAuditorsParser(CreditedAuditors string) (int, error) {
