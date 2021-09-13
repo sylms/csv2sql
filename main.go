@@ -349,7 +349,13 @@ func instructorParser(instructors string) ([]string, error) {
 	if instructors == "" {
 		return []string{}, nil
 	} else {
-		res := strings.Split(instructors, ",")
+		var res []string
+		slicedInstructors := strings.Split(instructors, ",")
+		for _, v := range slicedInstructors {
+			if "" != strings.Replace(v, " ", "", -1) {
+				res = append(res, v)
+			}
+		}
 		return res, nil
 	}
 }
