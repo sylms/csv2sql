@@ -348,7 +348,7 @@ func termParser(termString string) []string {
 func instructorParser(instructors string) ([]string, error) {
 	// A, B, C 他 のような入力の際に [ A, B, C, 他] と返すように
 	re0 := regexp.MustCompile("他")
-	processedInstructors := re0.ReplaceAllString(instructors, `,他`)
+	processedInstructors := re0.ReplaceAllString(instructors, `,他,`)
 	res := strings.Split(processedInstructors, ",")
 	return res, nil
 }
