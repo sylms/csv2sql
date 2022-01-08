@@ -9,7 +9,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Test_termParser(t *testing.T) {
+func Test_TermParser(t *testing.T) {
 	type args struct {
 		term_string string
 	}
@@ -38,9 +38,9 @@ func Test_termParser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := termParser(tt.args.term_string)
+			got := TermParser(tt.args.term_string)
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("termParser() = %v, want %v", got, tt.want)
+				t.Errorf("TermParser() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -136,7 +136,7 @@ func Test_csvStringDateParser(t *testing.T) {
 	}
 }
 
-func Test_termStrToInt(t *testing.T) {
+func Test_TermStrToInt(t *testing.T) {
 	type args struct {
 		term []string
 	}
@@ -192,13 +192,13 @@ func Test_termStrToInt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := termStrToInt(tt.args.term)
+			got, err := TermStrToInt(tt.args.term)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("termStrToInt() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TermStrToInt() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("termStrToInt() = %v, want %v", got, tt.want)
+				t.Errorf("TermStrToInt() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -286,7 +286,7 @@ func Test_standardRegistrationYearParser(t *testing.T) {
 	}
 }
 
-func Test_periodParser(t *testing.T) {
+func Test_PeriodParser(t *testing.T) {
 	type args struct {
 		periodString string
 	}
@@ -445,18 +445,18 @@ func Test_periodParser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := periodParser(tt.args.periodString)
+			got, err := PeriodParser(tt.args.periodString)
 
 			// slice の順序は重視していないためソートして両方あわせる
 			sort.Strings(got)
 			sort.Strings(tt.want)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("periodParser() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("PeriodParser() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("periodParser() = %v, want %v", got, tt.want)
+				t.Errorf("PeriodParser() = %v, want %v", got, tt.want)
 			}
 		})
 	}

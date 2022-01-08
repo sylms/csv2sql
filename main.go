@@ -215,9 +215,9 @@ func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 			continue
 		}
 
-		term := termParser(row.Term)
+		term := TermParser(row.Term)
 
-		termInt, err := termStrToInt(term)
+		termInt, err := TermStrToInt(term)
 		if err != nil {
 			return nil, err
 		}
@@ -237,7 +237,7 @@ func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 			return nil, err
 		}
 
-		period, err := periodParser(row.Period)
+		period, err := PeriodParser(row.Period)
 		if err != nil {
 			return nil, err
 		}
@@ -293,7 +293,7 @@ func execMigrate() error {
 	return nil
 }
 
-func termParser(termString string) []string {
+func TermParser(termString string) []string {
 	res := []string{}
 	if termString == "" {
 		return []string{}
@@ -383,7 +383,7 @@ func getDateTimeNow() time.Time {
 
 // 開講時期を数値に変換
 // 別テーブルなどで管理するのが適切（？）
-func termStrToInt(term []string) ([]int, error) {
+func TermStrToInt(term []string) ([]int, error) {
 	res := []int{}
 	for _, t := range term {
 		switch t {
@@ -530,7 +530,7 @@ func standardRegistrationYearParser(yearString string) ([]string, error) {
 }
 
 // 時間割をいい感じにして配列で
-func periodParser(periodString string) ([]string, error) {
+func PeriodParser(periodString string) ([]string, error) {
 	period := []string{}
 	periodString = strings.Replace(periodString, " ", "", -1)
 	periodString = strings.Replace(periodString, "　", "", -1)
