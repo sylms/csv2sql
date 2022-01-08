@@ -1,12 +1,10 @@
-package csv2sql
+package kdb
 
 import (
 	"reflect"
 	"sort"
 	"testing"
 	"time"
-
-	_ "github.com/lib/pq"
 )
 
 func Test_TermParser(t *testing.T) {
@@ -91,46 +89,13 @@ func Test_creditedAuditorsParser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := creditedAuditorsParser(tt.args.CreditedAuditors)
+			got, err := CreditedAuditorsParser(tt.args.CreditedAuditors)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("creditedAuditorsParser() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
 				t.Errorf("creditedAuditorsParser() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_csvStringDateParser(t *testing.T) {
-	type args struct {
-		date string
-	}
-	jst, _ := time.LoadLocation("Asia/Tokyo")
-	tests := []struct {
-		name    string
-		args    args
-		want    time.Time
-		wantErr bool
-	}{
-		{
-			name: "normal",
-			args: args{
-				date: "2021-03-01 14:27:49",
-			},
-			want: time.Date(2021, 03, 01, 14, 27, 49, 00, jst),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := csvStringDateParser(tt.args.date)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("csvStringDateParser() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("csvStringDateParser() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -274,7 +239,7 @@ func Test_standardRegistrationYearParser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := standardRegistrationYearParser(tt.args.yearString)
+			got, err := StandardRegistrationYearParser(tt.args.yearString)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("standardRegistrationYearParser() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -457,6 +422,39 @@ func Test_PeriodParser(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("PeriodParser() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_DateParser(t *testing.T) {
+	type args struct {
+		date string
+	}
+	jst, _ := time.LoadLocation("Asia/Tokyo")
+	tests := []struct {
+		name    string
+		args    args
+		want    time.Time
+		wantErr bool
+	}{
+		{
+			name: "normal",
+			args: args{
+				date: "2021-03-01 14:27:49",
+			},
+			want: time.Date(2021, 03, 01, 14, 27, 49, 00, jst),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := DateParser(tt.args.date)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DateParser() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("DateParser() = %v, want %v", got, tt.want)
 			}
 		})
 	}
