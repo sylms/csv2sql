@@ -1,4 +1,4 @@
-package main
+package csv2sql
 
 import (
 	"database/sql"
