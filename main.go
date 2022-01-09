@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -230,15 +229,15 @@ func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 			StandardRegistrationYear: standardRegistrationYearParser,
 			Term:                     termInt,
 			Period:                   period,
-			Classroom:                newSQLNullString(row.Classroom),
+			Classroom:                row.Classroom,
 			Instructor:               instructor,
-			CourseOverview:           newSQLNullString(row.CourseOverview),
-			Remarks:                  newSQLNullString(row.Remarks),
+			CourseOverview:           row.CourseOverview,
+			Remarks:                  row.Remarks,
 			CreditedAuditors:         creditedAuditors,
-			ApplicationConditions:    newSQLNullString(row.ApplicationConditions),
-			AltCourseName:            newSQLNullString(row.AltCourseName),
-			CourseCode:               newSQLNullString(row.CourseCode),
-			CourseCodeName:           newSQLNullString(row.CourseCodeName),
+			ApplicationConditions:    row.ApplicationConditions,
+			AltCourseName:            row.AltCourseName,
+			CourseCode:               row.CourseCode,
+			CourseCodeName:           row.CourseCodeName,
 			CSVUpdatedAt:             csvUpdatedAt,
 			Year:                     year,
 			CreatedAt:                now,
@@ -247,16 +246,6 @@ func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 		courses = append(courses, s)
 	}
 	return courses, nil
-}
-
-func newSQLNullString(s string) sql.NullString {
-	if s == "" {
-		return sql.NullString{String: "", Valid: false}
-	}
-	return sql.NullString{
-		String: s,
-		Valid:  true,
-	}
 }
 
 func execMigrate() error {
@@ -280,26 +269,26 @@ func insert(tx *sqlx.Tx, courses []Courses) error {
 	// UNIQUE 指定すれば、確認しなくてもよいらしい（？）
 
 	type insertPrepare struct {
-		CourseNumber             string         `db:"course_number"`
-		CourseName               string         `db:"course_name"`
-		InstructionalType        int            `db:"instructional_type"`
-		Credits                  string         `db:"credits"`
-		StandardRegistrationYear interface{}    `db:"standard_registration_year"`
-		Term                     interface{}    `db:"term"`
-		Period                   interface{}    `db:"period_"`
-		Classroom                sql.NullString `db:"classroom"`
-		Instructor               interface{}    `db:"instructor"`
-		CourseOverview           sql.NullString `db:"course_overview"`
-		Remarks                  sql.NullString `db:"remarks"`
-		CreditedAuditors         int            `db:"credited_auditors"`
-		ApplicationConditions    sql.NullString `db:"application_conditions"`
-		AltCourseName            sql.NullString `db:"alt_course_name"`
-		CourseCode               sql.NullString `db:"course_code"`
-		CourseCodeName           sql.NullString `db:"course_code_name"`
-		CSVUpdatedAt             time.Time      `db:"csv_updated_at"`
-		Year                     int            `db:"year"`
-		CreatedAt                time.Time      `db:"created_at"`
-		UpdatedAt                time.Time      `db:"updated_at"`
+		CourseNumber             string      `db:"course_number"`
+		CourseName               string      `db:"course_name"`
+		InstructionalType        int         `db:"instructional_type"`
+		Credits                  string      `db:"credits"`
+		StandardRegistrationYear interface{} `db:"standard_registration_year"`
+		Term                     interface{} `db:"term"`
+		Period                   interface{} `db:"period_"`
+		Classroom                string      `db:"classroom"`
+		Instructor               interface{} `db:"instructor"`
+		CourseOverview           string      `db:"course_overview"`
+		Remarks                  string      `db:"remarks"`
+		CreditedAuditors         int         `db:"credited_auditors"`
+		ApplicationConditions    string      `db:"application_conditions"`
+		AltCourseName            string      `db:"alt_course_name"`
+		CourseCode               string      `db:"course_code"`
+		CourseCodeName           string      `db:"course_code_name"`
+		CSVUpdatedAt             time.Time   `db:"csv_updated_at"`
+		Year                     int         `db:"year"`
+		CreatedAt                time.Time   `db:"created_at"`
+		UpdatedAt                time.Time   `db:"updated_at"`
 	}
 
 	// 全て（約 19,000 件）を一気に insert しようとしたら制限に引っかかった

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -41,17 +40,17 @@ type Courses struct {
 	// 対応付けを別に持つ
 	Term []int `db:"term"`
 	// 例：月1, 月2
-	Period         []string       `db:"period_"`
-	Classroom      sql.NullString `db:"classroom"`
-	Instructor     []string       `db:"instructor"`
-	CourseOverview sql.NullString `db:"course_overview"`
-	Remarks        sql.NullString `db:"remarks"`
+	Period         []string `db:"period_"`
+	Classroom      string   `db:"classroom"`
+	Instructor     []string `db:"instructor"`
+	CourseOverview string   `db:"course_overview"`
+	Remarks        string   `db:"remarks"`
 	// 0 = 'x', 1 = 三角, 2 = ''
-	CreditedAuditors      int            `db:"credited_auditors"`
-	ApplicationConditions sql.NullString `db:"application_conditions"`
-	AltCourseName         sql.NullString `db:"alt_course_name"`
-	CourseCode            sql.NullString `db:"course_code"`
-	CourseCodeName        sql.NullString `db:"course_code_name"`
+	CreditedAuditors      int    `db:"credited_auditors"`
+	ApplicationConditions string `db:"application_conditions"`
+	AltCourseName         string `db:"alt_course_name"`
+	CourseCode            string `db:"course_code"`
+	CourseCodeName        string `db:"course_code_name"`
 	// CSV 上にある「データ更新日」
 	CSVUpdatedAt time.Time `db:"csv_updated_at"`
 	Year         int       `db:"year"`
