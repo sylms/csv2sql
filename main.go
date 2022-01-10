@@ -189,9 +189,16 @@ func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 			continue
 		}
 
-		term := kdb.TermParser(row.Term)
+		terms := kdb.TermParser(row.Term)
+		termsInt := []int{}
+		for _, term := range terms {
+			termInt, err := kdb.TermStrToInt(term)
+			if err != nil {
+				return nil, errors.WithStack(err)
+			}
+			termsInt = append(termsInt, termInt)
+		}
 
-		termInt, err := kdb.TermStrToInt(term)
 		if err != nil {
 			return nil, err
 		}
@@ -227,7 +234,7 @@ func csvToCoursesStruct(reader io.ReadCloser) ([]Courses, error) {
 			InstructionalType:        row.InstructionalType,
 			Credits:                  strings.TrimSpace(row.Credits),
 			StandardRegistrationYear: standardRegistrationYearParser,
-			Term:                     termInt,
+			Term:                     termsInt,
 			Period:                   period,
 			Classroom:                row.Classroom,
 			Instructor:               instructor,
