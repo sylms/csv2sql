@@ -154,28 +154,28 @@ func TermStrToInt(term string) (int, error) {
 // 中黒をハイフンとして解釈すると"?" or "int" or "int-int" になるので，"?", "int" はそのまま
 // それ以外は間全てをいれる
 func StandardRegistrationYearParser(yearString string) ([]string, error) {
-	year := []string{}
-	yearString = strings.Replace(yearString, "ー", "-", -1)
-	yearString = strings.Replace(yearString, "・", "-", -1)
-	yearString = strings.Replace(yearString, "～", "-", -1)
-	yearString = strings.Replace(yearString, "~", "-", -1)
-	yearString = strings.Replace(yearString, "、", ",", -1)
 	yearString = strings.Replace(yearString, " ", "", -1)
 
-	if len(yearString) == 1 {
-		year = append(year, yearString)
-	} else {
-		minYear, err := strconv.Atoi(string(yearString[0]))
-		if err != nil {
-			return []string{}, err
-		}
-		maxYear, _ := strconv.Atoi(string(yearString[2]))
-		if err != nil {
-			return []string{}, err
-		}
-		for i := minYear; i <= maxYear; i++ {
-			year = append(year, strconv.Itoa(i))
-		}
+	// 部分文字列を正確に取り出すため
+	yearRune := []rune(yearString)
+
+	if len(yearRune) == 1 {
+		return []string{yearString}, nil
+	}
+
+	minYear, err := strconv.Atoi(string(yearRune[0]))
+	if err != nil {
+		return []string{}, err
+	}
+
+	maxYear, err := strconv.Atoi(string(yearRune[2]))
+	if err != nil {
+		return []string{}, err
+	}
+
+	year := []string{}
+	for i := minYear; i <= maxYear; i++ {
+		year = append(year, strconv.Itoa(i))
 	}
 
 	return year, nil

@@ -112,7 +112,7 @@ func Test_standardRegistrationYearParser(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "nakaguro",
+			name: "中黒を認識できる",
 			args: args{
 				yearString: "1・3",
 			},
@@ -120,7 +120,7 @@ func Test_standardRegistrationYearParser(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "haihun",
+			name: "半角ハイフンを認識できる",
 			args: args{
 				yearString: "1-3",
 			},
@@ -128,7 +128,15 @@ func Test_standardRegistrationYearParser(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "haihun space",
+			name: "～を認識できる",
+			args: args{
+				yearString: "1～3",
+			},
+			want:    []string{"1", "2", "3"},
+			wantErr: false,
+		},
+		{
+			name: "年次の数字と数字間を結ぶ記号にスペースがある",
 			args: args{
 				yearString: "1 - 3",
 			},
@@ -136,15 +144,7 @@ func Test_standardRegistrationYearParser(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "1・2",
-			args: args{
-				yearString: "1・2",
-			},
-			want:    []string{"1", "2"},
-			wantErr: false,
-		},
-		{
-			name: "simgle",
+			name: "年次が一つの場合が認識できる",
 			args: args{
 				yearString: "1",
 			},
@@ -152,7 +152,7 @@ func Test_standardRegistrationYearParser(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "question",
+			name: "'?'をそのまま保持する",
 			args: args{
 				yearString: "?",
 			},
@@ -161,7 +161,7 @@ func Test_standardRegistrationYearParser(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "not int",
+			name: "年次（数字）ではないものはエラーになる",
 			args: args{
 				yearString: "invalid",
 			},
