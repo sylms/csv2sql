@@ -121,65 +121,61 @@ func DateParser(date string) (time.Time, error) {
 
 // 開講時期を数値に変換
 // 別テーブルなどで管理するのが適切（？）
-func TermStrToInt(term []string) ([]int, error) {
-	res := []int{}
-	for _, t := range term {
-		switch t {
-		case "春A":
-			res = append(res, TermSpringACode)
-		case "春B":
-			res = append(res, TermSpringBCode)
-		case "春C":
-			res = append(res, TermSpringCCode)
-		case "秋A":
-			res = append(res, TermFallACode)
-		case "秋B":
-			res = append(res, TermFallBCode)
-		case "秋C":
-			res = append(res, TermFallCCode)
-		case "夏季休業中":
-			res = append(res, TermSummerVacationCode)
-		case "春季休業中":
-			res = append(res, TermSpringVacationCode)
-		case "通年":
-			res = append(res, TermAllCode)
-		case "春学期":
-			res = append(res, TermSpringCode)
-		case "秋学期":
-			res = append(res, TermFallCode)
-		default:
-			return nil, fmt.Errorf("invalid term string: %s", t)
-		}
+func TermStrToInt(term string) (int, error) {
+	switch term {
+	case "春A":
+		return TermSpringACode, nil
+	case "春B":
+		return TermSpringBCode, nil
+	case "春C":
+		return TermSpringCCode, nil
+	case "秋A":
+		return TermFallACode, nil
+	case "秋B":
+		return TermFallBCode, nil
+	case "秋C":
+		return TermFallCCode, nil
+	case "夏季休業中":
+		return TermSummerVacationCode, nil
+	case "春季休業中":
+		return TermSpringVacationCode, nil
+	case "通年":
+		return TermAllCode, nil
+	case "春学期":
+		return TermSpringCode, nil
+	case "秋学期":
+		return TermFallCode, nil
+	default:
+		return -1, fmt.Errorf("invalid term string: %s", term)
 	}
-	return res, nil
 }
 
 // 標準履修年次をパースする
 // 中黒をハイフンとして解釈すると"?" or "int" or "int-int" になるので，"?", "int" はそのまま
 // それ以外は間全てをいれる
 func StandardRegistrationYearParser(yearString string) ([]string, error) {
-	year := []string{}
-	yearString = strings.Replace(yearString, "ー", "-", -1)
-	yearString = strings.Replace(yearString, "・", "-", -1)
-	yearString = strings.Replace(yearString, "～", "-", -1)
-	yearString = strings.Replace(yearString, "~", "-", -1)
-	yearString = strings.Replace(yearString, "、", ",", -1)
 	yearString = strings.Replace(yearString, " ", "", -1)
 
-	if len(yearString) == 1 {
-		year = append(year, yearString)
-	} else {
-		minYear, err := strconv.Atoi(string(yearString[0]))
-		if err != nil {
-			return []string{}, err
-		}
-		maxYear, _ := strconv.Atoi(string(yearString[2]))
-		if err != nil {
-			return []string{}, err
-		}
-		for i := minYear; i <= maxYear; i++ {
-			year = append(year, strconv.Itoa(i))
-		}
+	// 部分文字列を正確に取り出すため
+	yearRune := []rune(yearString)
+
+	if len(yearRune) == 1 {
+		return []string{yearString}, nil
+	}
+
+	minYear, err := strconv.Atoi(string(yearRune[0]))
+	if err != nil {
+		return []string{}, err
+	}
+
+	maxYear, err := strconv.Atoi(string(yearRune[2]))
+	if err != nil {
+		return []string{}, err
+	}
+
+	year := []string{}
+	for i := minYear; i <= maxYear; i++ {
+		year = append(year, strconv.Itoa(i))
 	}
 
 	return year, nil
