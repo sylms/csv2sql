@@ -13,7 +13,7 @@ services:
       - SYLMS_POSTGRES_PASSWORD=sylms
       - SYLMS_POSTGRES_HOST=db
       - SYLMS_POSTGRES_PORT=5432
-      - SYLMS_CSV_YEAR=2021
+      - SYLMS_CSV_YEAR=2022
     entrypoint: dockerize --wait tcp://db:5432
     command: /app/csv2sql
     depends_on:
