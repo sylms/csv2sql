@@ -192,6 +192,7 @@ func PeriodParser(periodString string) ([]string, error) {
 	periodString = strings.Replace(periodString, "集中", "集0", -1)
 	periodString = strings.Replace(periodString, "応談", "応0", -1)
 	periodString = strings.Replace(periodString, "随時", "随0", -1)
+	periodString = strings.Replace(periodString, "NT", "流0", -1)
 
 	for i := 1; i <= 8; i++ {
 		listPeriod := strconv.Itoa(i)
@@ -203,7 +204,7 @@ func PeriodParser(periodString string) ([]string, error) {
 	}
 
 	for i := 0; i <= 8; i++ {
-		for _, dayOfWeek := range []string{"月", "火", "水", "木", "金", "土", "日", "応", "随", "集"} {
+		for _, dayOfWeek := range []string{"月", "火", "水", "木", "金", "土", "日", "応", "随", "集", "流"} {
 			beforeStr1 := strconv.Itoa(i) + dayOfWeek
 			beforeStr2 := dayOfWeek + strconv.Itoa(i)
 			afterStr1 := strconv.Itoa(i) + "," + dayOfWeek
@@ -234,6 +235,7 @@ func PeriodParser(periodString string) ([]string, error) {
 					inputStr = strings.Replace(inputStr, "随", "随時", -1)
 					inputStr = strings.Replace(inputStr, "応0", "応", -1)
 					inputStr = strings.Replace(inputStr, "応", "応談", -1)
+					inputStr = strings.Replace(inputStr, "流0", "NT", -1)
 					period = append(period, inputStr)
 				}
 			}
